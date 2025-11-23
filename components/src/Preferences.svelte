@@ -1,5 +1,5 @@
 <svelte:options
-  customElement={{ tag: "websocket-preference", shadow: "none" }}
+  customElement={{ tag: "webaudioapi-preference", shadow: "none" }}
 />
 
 <script>
@@ -16,7 +16,7 @@
 
   // @ts-ignore
   const messagePort = createPackageMessagePort(
-    "package-websocket",
+    "package-webaudioapi",
     "preferences",
   );
 
@@ -32,6 +32,9 @@
   }
 
   onMount(() => {
+
+    getAudioInputDevices();
+
     messagePort.onmessage = (e) => {
       const data = e.data;
       if (data.type === "clientStatus") {
@@ -44,22 +47,45 @@
       messagePort.close();
     };
   });
+
+  let audioInputDevices;
+  let selectedDeviceId;
+  // Fetch available audio devices
+  async function getAudioInputDevices() {
+    try {
+      // We must ask for permission first to get labels (names of devices)
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      console.log(devices);
+      audioInputDevices = devices.filter(device => device.kind === 'audioinput');
+      
+      // Try to find BlackHole or default to first available
+      const blackhole = audioInputDevices.find(d => d.label.toLowerCase().includes('blackhole'));
+      if (blackhole) {
+        selectedDeviceId = blackhole.deviceId;
+      } else if (audioInputDevices.length > 0 && !selectedDeviceId) {
+        selectedDeviceId = audioInputDevices[0].deviceId;
+      }
+    } catch (error) {
+      console.error('Error enumerating devices:', error);
+    }
+  }
+
+  onMount(() => {
+    
+  });
 </script>
 
 <main-app>
   <div class="px-4 bg-secondary rounded-lg">
     <Block>
       <BlockTitle>
-        <div class="flex flex-row content-center">
-          Websocket Preference <div
-            style="margin-left: 12px; width: 12px; height: 12px; border-radius: 50%; background-color: {currentlyConnected
-              ? '#00D248'
-              : '#fb2323'}"
-          />
-        </div>
+       Audio Capture
       </BlockTitle>
       <BlockBody>
-        Connection to client : {currentlyConnected ? "Connected" : "Connecting"}
+
+
       </BlockBody>
       <BlockBody>
         Window focus

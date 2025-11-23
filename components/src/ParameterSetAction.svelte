@@ -13,9 +13,9 @@
   let ref;
   let isInitialized = false;
 
-  const actionRegex = /^gps\("package-websocket", "*(.*?)", (.*?)\)$/;
+  const actionRegex = /^gps\("package-webaudioapi", "*(.*?)", (.*?)\)$/;
   function actualCode() {
-    return `gps("package-websocket", "${parameterId}", ${parameterValue})`;
+    return `gps("package-webaudioapi", "${parameterId}", ${parameterValue})`;
   }
 
   function handleConfigUpdate(config) {

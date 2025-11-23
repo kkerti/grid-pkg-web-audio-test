@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const WebSocket = require("ws");
 
-const websocketPort = 9834;
+const websocketPort = 1111;
 let activeWindowTitle = "Firefox";
 
 let wss = undefined;
@@ -48,7 +48,7 @@ exports.loadPackage = async function (gridController, persistedData) {
   createAction({
     short: "xwsps",
     displayName: "Parameter Set",
-    defaultLua: 'gps("package-websocket", "volume", self:get_auto_value())',
+    defaultLua: 'gps("package-webaudioapi", "volume", self:get_auto_value())',
     actionComponent: "websocket-parameter-set-action",
   });
 
@@ -199,12 +199,20 @@ function activeWindowRequestNoResponse() {
 function handleWebsocketMessage(message) {
   let data = JSON.parse(message);
   console.log({ data });
-  if (data.type === "execute-code") {
+  // if (data.type === "audio-peak") {
+  //   controller.sendMessageToEditor({
+  //     type: "execute-lua-script",
+  //     script: `pkg_waa_cb(${data.value})`,
+  //     targetDx: 0,
+  //     targetDy: 0,
+  //   });
+  // }
+  if (data.type === "audio-peak-bands") {
     controller.sendMessageToEditor({
       type: "execute-lua-script",
-      script: data.script,
-      targetDx: data.targetDx,
-      targetDy: data.targetDy,
+      script: `pkg_waa_cb(${data.value})`,
+      targetDx: 0,
+      targetDy: 0,
     });
   }
 }
